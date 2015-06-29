@@ -1,4 +1,4 @@
-
+<h3 class="warning"><?= isset($pageTitle) ? $pageTitle : '' ?></h3>
 <div class="reg_form">
 <div class="form_title">Sign Up</div>
 <div class="form_sub_title">It's free and anyone can join</div>

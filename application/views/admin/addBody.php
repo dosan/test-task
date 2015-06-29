@@ -2,7 +2,7 @@
 <?= isset($errors) ? $errors : '' ?>
 <form action="<?= base_url() ?>admin/updateOrAdd" method="POST">
 	<!-- Session::get('author') -->
-	<input type="hidden" name="author_id" value="1">
+	<input type="hidden" name="author_id" value="<?= $this->session->userdata('id') ?>">
 	<div class="panel panel-default">
 		<div class="panel-heading">Title</div>
 		<div class="panel-body">

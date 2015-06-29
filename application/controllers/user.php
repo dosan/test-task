@@ -9,7 +9,7 @@ class User extends CI_Controller{
 		$this->load->helper(array('form', 'url'));
 		$this->load->model('users_model');
 		$this->load->library('session');
- 		$this->navData = array(
+		$this->navData = array(
 			'meta_description' => "index",
 			'meta_keywords' => "index",
 			'meta_classification' => "index",
@@ -28,7 +28,7 @@ class User extends CI_Controller{
 
 		//what the nav needs
 		$navigation_data = $this->navData;
-		$navigation_data['navTab'] = "profile";
+		$navigation_data['navTab'] = "user";
 		//basic info for the header
 		$layout_data['pageTitle'] = "User Profile";
 		$body_data['pageTitle'] = $layout_data['pageTitle'];
@@ -96,6 +96,7 @@ class User extends CI_Controller{
 	}
 	public function registration(){
 		$this->load->library('form_validation');
+		$this->load->helper('string');
 		// field name, error message, validation rules
 		$this->form_validation->set_rules('user_name', 'User Name', 'trim|required|min_length[4]|xss_clean');
 		$this->form_validation->set_rules('email_address', 'Your Email', 'trim|required|valid_email');
@@ -104,8 +105,10 @@ class User extends CI_Controller{
 
 		if($this->form_validation->run() != FALSE){
 			if ($this->users_model->getDuplicate() == FALSE) {
-				$result = $this->users_model->register();
+				$verification_code = random_string('alnum',20);
+				$result = $this->users_model->register($verification_code);
 				if ($result) {
+					$this->sendActivationCode($this->input->post('email_address'), $this->input->post('user_name'), $verification_code);
 					$this->thank();
 				}else{
 					$this->session->set_flashdata('message', '<div class="warning">Something went wrong</div>');
@@ -129,9 +132,46 @@ class User extends CI_Controller{
 			'email'     => '',
 			'logged_in' => FALSE,
 		);
-		$this->session->unset_userdata($newdata );
+		$this->session->unset_userdata($newdata);
 		$this->session->sess_destroy();
 		$this->index();
+	}
+	public function sendActivationCode($email, $name, $verification_code){
+		$config = Array(
+			'protocol' => 'smtp',
+			'smtp_host' => 'smtp.yourdomain.com.',
+			'smtp_port' => 465,
+			'smtp_user' => 'admin@yourdomain.com', // change it to yours
+			'smtp_pass' => '########', // change it to yours
+			'mailtype' => 'html',
+			'charset' => 'iso-8859-1',
+			'wordwrap' => TRUE
+		);
+		
+		
+		$this->load->library('email', $config);
+
+		$this->email->clear();
+
+		$this->email->from('your@example.com', 'Your Name');
+		$this->email->to($email);
+
+		$this->email->subject('Registration User');
+		$this->email->message("Dear ".$name.",\nPlease click on below URL or paste into your browser to verify your Email Address\n\n ".base_url().'verify/'.$verification_code."\n"."\n\nThanks\nAdmin Team");
+ 
+		$this->email->send();
+
+		echo $this->email->print_debugger();
+	}
+	public function verify($verification_code = null){
+		if ($verification_code == null && $verification_code == '') show_404();
+		$records = $this->users_model->verifyEmailAddress($verification_code);  
+		if ($records > 0)
+			$message = array( 'success' => "Email Verified Successfully!"); 
+		else
+			$message = array( 'error' => "Sorry Unable to Verify Your Email!"); 
+		$data['message'] = $message; 
+		$this->load->view('activated.php', $data);   
 	}
 }
 ?>

@@ -54,12 +54,6 @@
 					<li><a href="/user">Sign Up</a></li>
 					<?php endif ?>
 					</div>
-					
-					<h4>Elsewhere</h4>
-					<ol class="list-unstyled">
-						<li><a href="https://github.com/dosan/test-task">GitHub</a></li>
-					</ol>
-					</div>
 				</div><!-- /.blog-sidebar -->
 			</div><!-- /.row -->
 		</div><!-- /.container -->

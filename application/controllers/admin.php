@@ -4,29 +4,57 @@ class Admin extends CI_Controller {
 	public $layout_data = array();
 
 	public $ckeditorData = array();
+	public $navData = array();
+	public $bodyData = array();
 
 	public function __construct(){
 		parent::__construct();
 		$this->load->model('articles_model');
+		$this->load->model('users_model');
+		$this->load->library('session');
+ 		$this->navData = array(
+			'meta_description' => "index",
+			'meta_keywords' => "index",
+			'meta_classification' => "index",
+		);
 	}
 
 	public function index(){
-		//what the nav needs
-		$navigation_data['navTab'] = "index";
+		// I have no time to make permissions
+		if ($this->session->userdata('logged_in') != TRUE) {
+			$this->load->helper(array('form', 'url'));
+			$navigation_data = $this->navData;
+			$navigation_data['navTab'] = "user";
 
-		//basic info for the header
-		$layout_data['pageTitle'] = "List of articles";
+			$layout_data['pageTitle'] = "User Profile";
 
-		$body_data['articles'] = $this->articles_model->getArticles();
-		$body_data['pageTitle'] = $layout_data['pageTitle'];
-		//get data from database
+			$body_data = $this->bodyData;
+			$body_data['pageTitle'] = "Please Sign in or Sign up to access Admin panel";
+			$body_data['message'] = $this->session->flashdata('message');
+			$body_data['message_login'] = $this->session->flashdata('message_login');
+			
+			$layout_data['content_navigation'] = $this->load->view('navigation', $navigation_data, true);
+			$layout_data['content_body'] = $this->load->view('registration_view', $body_data, true);
+			$this->load->view('layouts/main', $layout_data);
+		}else{
+			//what the nav needs
+			$navigation_data['navTab'] = "index";
 
-		//load the content variables
-		$layout_data['content_navigation'] = $this->load->view('admin/navigation', $navigation_data, true);
-		$layout_data['content_body'] = $this->load->view('admin/indexBody', $body_data, true);
+			//basic info for the header
+			$layout_data['pageTitle'] = "List of articles";
 
-		$this->load->view('layouts/dashboard', $layout_data);
+			$body_data['articles'] = $this->articles_model->getArticles();
+			$body_data['pageTitle'] = $layout_data['pageTitle'];
+			//get data from database
+
+			//load the content variables
+			$layout_data['content_navigation'] = $this->load->view('admin/navigation', $navigation_data, true);
+			$layout_data['content_body'] = $this->load->view('admin/indexBody', $body_data, true);
+
+			$this->load->view('layouts/dashboard', $layout_data);
+		}
 	}
+
 	public function article($id = ''){
 		if (!is_numeric($id) || !$id) show_404();
 
@@ -45,6 +73,76 @@ class Admin extends CI_Controller {
 		$layout_data['content_body'] = $this->load->view('admin/articleBody', $body_data, true);
 
 		$this->load->view('layouts/dashboard', $layout_data);
+	}
+	public function users(){
+
+		//what the nav needs
+		$navigation_data['navTab'] = "users";
+		//basic info for the header
+		$layout_data['pageTitle'] = "Users List";
+		$body_data['users'] = $this->users_model->getUsers();
+		$body_data['pageTitle'] = $layout_data['pageTitle'];
+
+		//load the content variables
+		$layout_data['content_navigation'] = $this->load->view('admin/navigation', $navigation_data, true);
+		$layout_data['content_body'] = $this->load->view('admin/usersBody', $body_data, true);
+
+		$this->load->view('layouts/dashboard', $layout_data);
+	}
+	public function user($id = ''){
+
+		if (!is_numeric($id) || !$id) show_404();
+
+		//get data from database
+		$body_data['user'] = $this->users_model->get($id);
+		if(empty($body_data['user'])) show_404();
+		$body_data['users_articles'] = $this->users_model->getArticlesByUser($body_data['user'][0]['id']);
+
+		//what the nav need
+		$navigation_data['navTab'] = "user";
+		//basic info for the header
+		$layout_data['pageTitle'] = "User ".$body_data['user'][0]['username'];
+		$body_data['pageTitle'] = $layout_data['pageTitle'];
+
+		//load the content variables
+		$layout_data['content_navigation'] = $this->load->view('admin/navigation', $navigation_data, true);
+		$layout_data['content_body'] = $this->load->view('admin/userBody', $body_data, true);
+
+		$this->load->view('layouts/dashboard', $layout_data);
+	}
+	public function sendmailto($id = ''){
+		$this->load->helper(array('form', 'url'));
+		if (!is_numeric($id) || !$id) show_404();
+
+		//get data from database
+		$body_data['user'] = $this->users_model->get($id);
+		if(empty($body_data['user'])) show_404();
+
+		//what the nav need
+		$navigation_data['navTab'] = "mail";
+		//basic info for the header
+		$layout_data['pageTitle'] = "Send Mail To ".$body_data['user'][0]['username'];
+		$body_data['pageTitle'] = $layout_data['pageTitle'];
+
+		//load the content variables
+		$layout_data['content_navigation'] = $this->load->view('admin/navigation', $navigation_data, true);
+		$layout_data['content_body'] = $this->load->view('admin/mailBody', $body_data, true);
+
+		$this->load->view('layouts/dashboard', $layout_data);
+	}
+	public function send(){
+		$this->load->library('email');
+		$this->email->clear();
+
+		$this->email->from('your@example.com', 'Your Name');
+		$this->email->to($email);
+
+		$this->email->subject('Email Test');
+		$this->email->message('Testing the email class.');
+
+		$this->email->send();
+
+		echo $this->email->print_debugger();
 	}
 	public function add(){
 		$this->ckeditor_init();

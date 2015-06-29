@@ -16,7 +16,7 @@
 | environments.
 |
 */
-$config['base_url'] = 'http://localhost/';
+$config['base_url'] = 'http://localhost/test-task/';
 
 /*
 |--------------------------------------------------------------------------

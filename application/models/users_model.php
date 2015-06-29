@@ -5,6 +5,12 @@ class Users_model extends CI_Model {
 	{
 		parent::__construct();
 	}
+	function getUsers(){
+		$this->db->select('id, username, email')
+		->from('users');
+		$query = $this->db->get();
+		return $query->result_array();
+	}
 	function get($id){
 		$this->db->select('id, username, email')
 		->from('users')
@@ -46,20 +52,26 @@ class Users_model extends CI_Model {
 	}
 	public function getDuplicate(){
 		$q =  $this->db->select('email')
-		      ->from('users')
-		      ->where('email', $this->input->post('email_address'))->get();
+			->from('users')
+			->where('email', $this->input->post('email_address'))->get();
 		if($q->num_rows() == 0)
 			return false;
 		return true;
 	}
-	public function register(){
-	    //insert goes here
+	public function register($verification_code){
+		//insert goes here
 		$data=array(
 			'username'=>$this->input->post('user_name'),
 			'email'=>$this->input->post('email_address'),
-			'password'=>md5($this->input->post('password'))
+			'password'=>md5($this->input->post('password')),
+			'email_verification_code' => $verification_code,
 		);
 		return $this->db->insert('users', $data);
+	}
+	public function verifyEmailAddress($verification_code){
+		$sql = 'UPDATE users SET active_status = 1 WHERE email_verification_code=?';
+		$this->db->query($sql, array($verification_code));
+		return $this->db->affected_rows();
 	}
 }
 ?>
