@@ -13,7 +13,7 @@
 		<link rel="stylesheet" href="<?= base_url() ?>public/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="screen" title="default">
 		<link rel="stylesheet" href="<?= base_url() ?>public/css/main.css" rel="stylesheet" type="text/css" media="screen" title="default">
 		<link rel="stylesheet" href="<?= base_url() ?>public/css/user.css" rel="stylesheet" type="text/css" media="screen" title="default">
-		<script type="text/javascript" src="/ckeditor/ckeditor.js"></script>
+		<script type="text/javascript" src="<?= base_url() ?>ckeditor/ckeditor.js"></script>
 		<script language="javascript" type="text/javascript" src="<?= base_url() ?>includes/scripts/jquery-1.2.6.min.js"></script>
 
 		<title><?= $pageTitle ?></title>
@@ -40,18 +40,17 @@
 					<h4>User Box</h4>
 					<?= isset($message_login) ? $message_login : ''  ?>
 					<?php if ($this->session->userdata('logged_in') == TRUE): ?>
-						<a href="/user"><?= $this->session->userdata('username') ?></a>
+						<a href="<?= base_url() ?>user"><?= $this->session->userdata('username') ?></a>
 						<br>
-						<?php echo anchor(base_url().'user/logout', 'Logout'); ?>
+						<?= anchor(base_url().'user/logout', 'Logout'); ?>
 					<?php else: ?>
-					<?php echo form_open(base_url()."user/login"); ?>
+					<?= form_open(base_url()."user/login"); ?>
 						<label for="user_email">Email:</label>
 						<input type="text" id="user_email" name="user_email" value="" />
 						<label for="user_password">Password:</label>
 						<input type="password" id="user_password" name="user_password" value="" />
 						<input type="submit" class="" value="Sign in" />
-					<?php echo form_close(); ?>
-					<li><a href="/user">Sign Up</a></li>
+					<?= form_close(); ?>
 					<?php endif ?>
 					</div>
 				</div><!-- /.blog-sidebar -->

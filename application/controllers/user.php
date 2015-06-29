@@ -137,31 +137,30 @@ class User extends CI_Controller{
 		$this->index();
 	}
 	public function sendActivationCode($email, $name, $verification_code){
-		$config = Array(
-			'protocol' => 'smtp',
-			'smtp_host' => 'smtp.yourdomain.com.',
-			'smtp_port' => 465,
-			'smtp_user' => 'admin@yourdomain.com', // change it to yours
-			'smtp_pass' => '########', // change it to yours
-			'mailtype' => 'html',
-			'charset' => 'iso-8859-1',
-			'wordwrap' => TRUE
-		);
-		
+        $config = array();
+        $config['useragent'] = "CodeIgniter";
+        $config['mailpath']  = "/usr/sbin/sendmail -t -i"; // or "/usr/sbin/sendmail"
+        $config['protocol']  = "smtp";
+        $config['smtp_host'] = "ssl://smtp.googlemail.com";
+        $config['smtp_port'] = "465";
+        $config['smtp_user'] = 'sandor@sandor.cu.cc';
+		$config['smtp_pass'] = '######';
+        $config['mailtype']  = 'html';
+        $config['charset']   = 'utf-8';
+        $config['newline']   = "\r\n";
+        $config['wordwrap']  = TRUE;
 		
 		$this->load->library('email', $config);
 
-		$this->email->clear();
+		//$this->email->clear();
 
-		$this->email->from('your@example.com', 'Your Name');
+		$this->email->from('sandor@sandor.cu.cc', 'Dosan');
 		$this->email->to($email);
 
 		$this->email->subject('Registration User');
 		$this->email->message("Dear ".$name.",\nPlease click on below URL or paste into your browser to verify your Email Address\n\n ".base_url().'verify/'.$verification_code."\n"."\n\nThanks\nAdmin Team");
  
 		$this->email->send();
-
-		echo $this->email->print_debugger();
 	}
 	public function verify($verification_code = null){
 		if ($verification_code == null && $verification_code == '') show_404();

@@ -4,7 +4,7 @@
 		<meta http-equiv="Content-Type" content="text/html;charset=us-ascii">
 		<link rel="stylesheet" href="<?= base_url() ?>public/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="screen" title="default">
 		<link rel="stylesheet" href="<?= base_url() ?>public/css/admin.css" rel="stylesheet" type="text/css" media="screen" title="default">
-		<script type="text/javascript" src="/ckeditor/ckeditor.js"></script>
+		<script type="text/javascript" src="<?= base_url() ?>ckeditor/ckeditor.js"></script>
 		<script language="javascript" type="text/javascript" src="<?= base_url() ?>includes/scripts/jquery-1.2.6.min.js"></script>
 		<title><?= $pageTitle ?></title>
 	</head>
